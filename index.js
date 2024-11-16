@@ -22,17 +22,23 @@ const getVal = (d, k) => {
     if (k in d) return d[k];
     return CONFIG.missingValueText;
 }
-function getComp(first, second) {
-    const [d1,d2] = [first.file, second.file].map(getDataFromFile);
-    const allKeys = _.uniq(Object.keys(d1).concat(Object.keys(d2)));
+function getComp(...envFiles) {
+    const envData = envFiles.map(e => e.file).map(getDataFromFile);
+    const allKeys = _.uniq(envData.reduce(
+        (acc, data) => acc.concat(Object.keys(data)), []
+    ));
     allKeys.sort();
     let resultData = allKeys.map(k => {
-        return [k, getVal(d1,k), getVal(d2,k)];
+        return [k, ...envData.map(d => getVal(d,k))];
     });
-    if (CONFIG.diffOnly) {
-        resultData = resultData.filter(row => row[1] != row[2]);
+    if (CONFIG.diffOnly && (envFiles.length > 1)) {
+        resultData = resultData.filter(row => _.uniq(row.slice(1)).length > 1);
     }
-    const resultString = [["KEY", first.label, second.label]].concat(resultData).map(r => r.join("\t")).join("\n");
+    if (CONFIG.missingOnly && (envFiles.length > 1)) {
+        resultData = resultData.filter(row => !!row.find(val => val === CONFIG.missingValueText));
+    }
+    
+    const resultString = [["KEY", ...envFiles.map(e => e.label)]].concat(resultData).map(r => r.join("\t")).join("\n");
     return resultString;
 }
 
