@@ -10,5 +10,6 @@ module.exports = {
         {file: FILES.WWW_UAT, label: "WWW_UAT"},
         {file: FILES.WWW_RC, label: "WWW_RC"}
     ],
-    diffOnly: true
+    diffOnly: true,
+    missingValueText: '[<<<< MISSING >>>>]'
 }

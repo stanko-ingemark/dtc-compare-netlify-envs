@@ -20,16 +20,16 @@ function getDataFromFile(fn){
 }
 const getVal = (d, k) => {
     if (k in d) return d[k];
-    return '<<<< MISSING >>>>';
+    return CONFIG.missingValueText;
 }
-function getComp(first, second, options = {}) {
+function getComp(first, second) {
     const [d1,d2] = [first.file, second.file].map(getDataFromFile);
     const allKeys = _.uniq(Object.keys(d1).concat(Object.keys(d2)));
     allKeys.sort();
     let resultData = allKeys.map(k => {
         return [k, getVal(d1,k), getVal(d2,k)];
     });
-    if (options.diffOnly) {
+    if (CONFIG.diffOnly) {
         resultData = resultData.filter(row => row[1] != row[2]);
     }
     const resultString = [["KEY", first.label, second.label]].concat(resultData).map(r => r.join("\t")).join("\n");
@@ -38,5 +38,4 @@ function getComp(first, second, options = {}) {
 
 console.log(getComp(
     ...CONFIG.envFiles,
-    {diffOnly: CONFIG.diffOnly}
 ))
