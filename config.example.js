@@ -1,16 +1,18 @@
-const FILES = {
-    MDA_UAT: "./account.stage.env",
-    MDA_RC: "./account.rc.env",
-    WWW_UAT: "./www.stage.env",
-    WWW_RC: "./www.rc.env"
-}
-
 module.exports = {
     envFiles: [
-        {file: FILES.WWW_UAT, label: "WWW_UAT"},
-        {file: FILES.WWW_RC, label: "WWW_RC"},
+        {
+            file: "./www.stage.env",  // relative (from script root) path to environment file, required
+            label: "WWW_UAT" // how the column will be labeled. Optional (uses file value if not present)
+        },
+        {
+            file: "./www.rc.env",
+            label: "WWW_RC"
+        },
     ],
-    diffOnly: true,
-    missingOnly: false,
-    missingValueText: '[<<<< MISSING >>>>]'
+    diffOnly: true, // if true, shows only environment variables which differ across env files
+    missingOnly: false, // if true, shows only environment variables 
+                        // which have missing value in at least one environment
+    missingValueText: '[<<<< MISSING >>>>]' // if environment variable is missing from the environment
+                                            // this value will be displayed 
+                                            // (easier to spot than empty string)
 }

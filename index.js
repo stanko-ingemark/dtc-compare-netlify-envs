@@ -8,7 +8,15 @@ if (!fs.existsSync(path.resolve(__dirname, 'config.js'))) {
 const CONFIG = require('./config.js');
 
 function getDataFromFile(fn){
+    if (!fn) {
+        console.log(`Missing "file" argument`);
+        process.exit(1);
+    }
     const filePath = path.resolve(__dirname, fn);
+    if (!fs.existsSync(filePath)) {
+        console.log(`File does not exist -- ${filePath}`);
+        process.exit(1);
+    }
     const rawData = fs.readFileSync(filePath).toString();
     const lines = rawData.split("\n").map(ln => ln.trim()).filter(l => !!l);
     const data = lines.map(ln => ln.split('=').map(v => v.trim())).filter(line => line.length === 2);
@@ -38,7 +46,7 @@ function getComp(...envFiles) {
         resultData = resultData.filter(row => !!row.find(val => val === CONFIG.missingValueText));
     }
     
-    const resultString = [["KEY", ...envFiles.map(e => e.label)]].concat(resultData).map(r => r.join("\t")).join("\n");
+    const resultString = [["KEY", ...envFiles.map(e => e.label || e.file)]].concat(resultData).map(r => r.join("\t")).join("\n");
     return resultString;
 }
 
