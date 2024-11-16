@@ -1,18 +1,17 @@
 const fs = require('fs');
+const path = require('path');
 const _ = require('lodash');
-
-
-const FILES = {
-    MDA_UAT: "account.stage.env",
-    MDA_RC: "account.rc.env",
-    WWW_UAT: "www.stage.env",
-    WWW_RC: "www.rc.env"
+if (!fs.existsSync(path.resolve(__dirname, 'config.js'))) {
+    console.error('Missing config.js');
+    process.exit(1);
 }
+const CONFIG = require('./config.js');
 
 function getDataFromFile(fn){
-    const rawData = fs.readFileSync(fn).toString();
+    const filePath = path.resolve(__dirname, fn);
+    const rawData = fs.readFileSync(filePath).toString();
     const lines = rawData.split("\n").map(ln => ln.trim()).filter(l => !!l);
-    const data = lines.map(ln => ln.split('=').map(v => v.trim()));
+    const data = lines.map(ln => ln.split('=').map(v => v.trim())).filter(line => line.length === 2);
     const result = {};
     data.forEach(([key, value]) => {
         result[key] = value;
@@ -38,7 +37,6 @@ function getComp(first, second, options = {}) {
 }
 
 console.log(getComp(
-    {file: FILES.WWW_UAT, label: "WWW_UAT"},
-    {file: FILES.WWW_RC, label: "WWW_RC"},
-    {diffOnly: true}
+    ...CONFIG.envFiles,
+    {diffOnly: CONFIG.diffOnly}
 ))
